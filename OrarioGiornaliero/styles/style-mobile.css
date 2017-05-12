@@ -1,0 +1,14 @@
+@media screen and (max-width: 600px) {
+	table td {
+		width: 100%;			
+		display: inline-block;
+	}
+	
+	input[type="text"] {
+		font-size:45px;
+	} 
+	
+	input { 
+		text-align: center; 
+	}
+}

@@ -1,0 +1,59 @@
+<HTML>
+	<HEAD>		
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<script type="text/javascript" src="moment-with-locales.js"> </script>
+		<script type="text/javascript" src="timespan.js"> </script>
+		<script type="text/javascript" src="calculate.js"> </script>
+		<script type="text/javascript" src="cookieManager.js"> </script>
+		<link href="./styles/style-mobile.css" rel="stylesheet" type="text/css">
+		<script type="text/javascript">
+			window.onload = function(){
+				loadValueFromCookie();
+				calcolaUscitaPrevista();
+			}
+		</script>
+	</HEAD>
+	<BODY>
+		<table cellspacing="10">
+			<tr>
+				<td><input type="button" class="button" name="btnDefault8" value="Arrivo alle 8" style="width: 100%" onclick="arrivalTemplate(8)"></td>
+				<td><input type="button" class="button" name="btnDefault8" value="Arrivo alle 9" style="width: 100%" onclick="arrivalTemplate(9)"></td>
+			</tr>
+		</table>
+		<table cellspacing="10">
+			<tr>
+				<td><font face="Batang" size="3">Faccio il continuato</font></td>
+				<td width="100px"><input type="checkbox" size="1" id="continuato" style="width: 100%" onchange="onContinuatoChangedHandler()"></td>
+			</tr>
+			<tr>
+				<td><font face="Batang" size="3">Entrata</font></td>
+				<td><input type="text" size="1" class="text" id="entrata" style="width: 100%" value="9:00" onblur="calcolaUscitaPrevista();"></td>
+			</tr>
+			<tr>
+				<td><font face="Batang" size="3">Pranzo (uscita)</font></td>
+				<td><input type="text" size="1" class="text" id="uscita_pranzo" style="width: 100%" value="13:00" onblur="calcolaUscitaPrevista();"></td>
+			</tr>			
+			<tr>
+				<td><font face="Batang" size="3">Pranzo (entrata)</font></td>
+				<td><input type="text" size="1" class="text" id="entrata_pranzo" style="width: 100%" value="14:00" onblur="calcolaUscitaPrevista();"></td>
+			</tr>
+			<tr>
+				<td><font face="Batang" size="3">Uscita</font></td>
+				<td><input type="text" size="1" class="text" id="uscita" style="width: 100%" value="18:00" onblur="calcolaUscitaPrevista();"></td>
+				<td><font face="Batang" size="3">* valorizzarla per calcolare le straordinarie</font></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><input type="button" class="button" name="btnCalcola" value="Calcola" style="width: 100%" onclick="calcolaUscitaPrevista();"></td>
+			</tr>
+			<tr>
+				<td><font face="Batang" size="3">Uscita prevista</font></td>
+				<td><font face="Batang" size="3" id="uscita_prevista" style="width: 100%">Non calcolata</td>				
+			</tr>			
+			<tr>
+				<td><b><font face="Batang" size="3">Straordinarie</font></b></td>
+				<td><font face="Batang" size="3" id="straordinarie"></font></td>
+			</tr>
+		</table>
+	</BODY>
+</HTML>
