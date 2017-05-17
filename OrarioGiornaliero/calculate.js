@@ -125,9 +125,12 @@ function calcolaUscitaPrevista() {
 			tsUscitaPrevista = moment(tsUscitaPrevista).add(tsRitardoPausaPranzo.hour(), 'hours').add(tsRitardoPausaPranzo.minutes(), 'minutes');
 		}
 				
-		//calcolo le straordinarie anche in base all'ora di uscita impostata
-		var straordinarieSerali = moment(tsUscita).subtract(tsUscitaPrevista.hour(), 'hours').subtract(tsUscitaPrevista.minutes(), 'minutes');
-		tsStraordinarie.add(straordinarieSerali.hour(), 'hours').add(straordinarieSerali.minutes(), 'minutes');
+		//calcolo le straordinarie anche in base all'ora di uscita impostata, solo se la data di uscita impostata è la stessa o successiva all'uscita prevista (altrimenti significa che sono uscito prima)
+		var isSameOrAfter = tsUscita.isSameOrAfter(tsUscitaPrevista);
+		if(isSameOrAfter) {
+			var straordinarieSerali = moment(tsUscita).subtract(tsUscitaPrevista.hour(), 'hours').subtract(tsUscitaPrevista.minutes(), 'minutes');
+			tsStraordinarie.add(straordinarieSerali.hour(), 'hours').add(straordinarieSerali.minutes(), 'minutes');
+		}
 		
 		controls.uscitaprevista.innerHTML = tsUscitaPrevista.format('HH:mm');
 		controls.straordinarie.innerHTML = tsStraordinarie.format('HH:mm');
