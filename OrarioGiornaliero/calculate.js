@@ -98,9 +98,14 @@ function calcolaUscitaPrevista() {
 					tsUscitaPrevista.minute(30);
 					tsStraordinarie.minute(30 - tsEntrata.minutes());
 				} else {
-					tsUscitaPrevista = moment(tsUscitaPrevista).add(1, 'hours');
-					tsUscitaPrevista.minute(0);
-					tsStraordinarie.minute(60 - tsEntrata.minute());
+					if(tsEntrata.minutes() > 30 && tsEntrata.minutes() <= 35) {
+						tsUscitaPrevista.minute(tsEntrata.minutes());
+						tsStraordinarie.minute(tsEntrata.minutes() - tsEntrata.minutes());
+					} else { 
+						tsUscitaPrevista = moment(tsUscitaPrevista).add(1, 'hours');
+						tsUscitaPrevista.minute(0);
+						tsStraordinarie.minute(60 - tsEntrata.minute());
+					}
 				}
 			}
 			tsUscitaPrevista = moment(tsUscitaPrevista).add(tsRitardoPausaPranzo.hour(), 'hours').add(tsRitardoPausaPranzo.minutes(), 'minutes');
