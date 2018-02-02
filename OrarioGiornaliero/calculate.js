@@ -59,7 +59,7 @@ function calcolaUscitaPrevista() {
 	controls.entratapranzo.style.backgroundColor = (tsEntrataPranzo === false) ? red : white;
 	controls.uscita.style.backgroundColor = (tsUscita === false) ? red : white;
 	
-	var canCalculate = (tsEntrata !== false && tsUscitaPranzo !== false && tsEntrataPranzo !== false && tsUscita !== false);
+	var canCalculate = (tsEntrata !== false && tsUscitaPranzo !== false && tsEntrataPranzo !== false);
 	
 	if(canCalculate) {
 		tsEntrata = new timespan(tsEntrata);
@@ -71,8 +71,10 @@ function calcolaUscitaPrevista() {
 		tsEntrataPranzo = new timespan(tsEntrataPranzo);
 		tsEntrataPranzo = moment().hour(tsEntrataPranzo.hour).minute(tsEntrataPranzo.minute);
 		
-		tsUscita = new timespan(tsUscita);
-		tsUscita = moment().hour(tsUscita.hour).minute(tsUscita.minute);
+		if(tsUscita !== false) {
+			tsUscita = new timespan(tsUscita);
+			tsUscita = moment().hour(tsUscita.hour).minute(tsUscita.minute);
+		}
 		
 		tsUscitaPrevista = moment(tsEntrata).add(controls.continuato.checked ? 8 : 9, 'hours');
 		tsStraordinarie = moment().hour(0).minute(0);		
@@ -81,12 +83,18 @@ function calcolaUscitaPrevista() {
 		//se il ritardo è di 0 ore, allora non ho fatto ritardo da pausa pranzo
 		//se il ritardo è di 1 ore, allora potrei aver fatto dei minuti di ritardo
 		//se il ritardo è > di 1 ore, allora ho fatto sicuramente ritardo
-		if(tsRitardoPausaPranzo.hour() == 0) {
-			tsRitardoPausaPranzo = moment().hour(0).minute(0);
-		} else if(tsRitardoPausaPranzo.hour() == 1) {
-			tsRitardoPausaPranzo = tsRitardoPausaPranzo.hour(0).minute(tsRitardoPausaPranzo.minutes());
-		} else {
-			tsRitardoPausaPranzo = tsRitardoPausaPranzo.hour(tsRitardoPausaPranzo.hour()).minute(tsRitardoPausaPranzo.minutes());
+		switch(tsRitardoPausaPranzo.hour()){
+			case 0:
+				tsRitardoPausaPranzo = moment().hour(0).minute(0);
+				break;				
+			
+			case 1:
+				tsRitardoPausaPranzo = tsRitardoPausaPranzo.hour(0).minute(tsRitardoPausaPranzo.minutes());
+				break;				
+			
+			default:
+				tsRitardoPausaPranzo = tsRitardoPausaPranzo.hour(tsRitardoPausaPranzo.hour()-1).minute(tsRitardoPausaPranzo.minutes());
+				break;
 		}
 		
 		//calcolo l'orario delle 7 e delle 8
@@ -108,7 +116,6 @@ function calcolaUscitaPrevista() {
 					}
 				}
 			}
-			tsUscitaPrevista = moment(tsUscitaPrevista).add(tsRitardoPausaPranzo.hour(), 'hours').add(tsRitardoPausaPranzo.minutes(), 'minutes');
 		}
 		
 		//calcolo l'orario successivo o compreso alle 9
@@ -127,14 +134,43 @@ function calcolaUscitaPrevista() {
 					}
 				}
 			}
-			tsUscitaPrevista = moment(tsUscitaPrevista).add(tsRitardoPausaPranzo.hour(), 'hours').add(tsRitardoPausaPranzo.minutes(), 'minutes');
 		}
-				
-		//calcolo le straordinarie anche in base all'ora di uscita impostata, solo se la data di uscita impostata è la stessa o successiva all'uscita prevista (altrimenti significa che sono uscito prima)
-		var isSameOrAfter = tsUscita.isSameOrAfter(tsUscitaPrevista);
-		if(isSameOrAfter) {
-			var straordinarieSerali = moment(tsUscita).subtract(tsUscitaPrevista.hour(), 'hours').subtract(tsUscitaPrevista.minutes(), 'minutes');
-			tsStraordinarie.add(straordinarieSerali.hour(), 'hours').add(straordinarieSerali.minutes(), 'minutes');
+		
+		//calcolo l'uscita prevista dopo aver calcolato tutte le altre timbrature
+		//devo calcolare l'uscita prevista anche in base al ritardo dalla pausa pranzo in modo corretto (15 minuti da recuperare, dopo si scala al quarto d'ora)
+		if(tsRitardoPausaPranzo.hour() === 0 && tsRitardoPausaPranzo.minutes() <= 15) {
+			tsUscitaPrevista = moment(tsUscitaPrevista).add(tsRitardoPausaPranzo.hour(), 'hours').add(tsRitardoPausaPranzo.minutes(), 'minutes');
+		} else {
+			//se ho fatto più di 15 minuti di ritardo scalo sul quarto d'ora
+			//tsUscitaPrevista = moment(tsUscitaPrevista).add(tsRitardoPausaPranzo.hour(), 'hours');
+			
+			if(tsRitardoPausaPranzo.minutes() === 0) {
+				tsUscitaPrevista = moment(tsUscitaPrevista).add(tsRitardoPausaPranzo.hour(), 'hours');
+			} else {
+				if(tsRitardoPausaPranzo.minutes() <= 15) {
+					tsUscitaPrevista = moment(tsUscitaPrevista).minute(tsRitardoPausaPranzo.minutes());
+				} else {			
+					if(tsRitardoPausaPranzo.minutes() > 15 && tsRitardoPausaPranzo.minutes() <= 30) {				
+						tsUscitaPrevista = moment(tsUscitaPrevista).minute(30);
+					} else {
+						if(tsRitardoPausaPranzo.minutes() > 30 && tsRitardoPausaPranzo.minutes() <= 45) {					
+							tsUscitaPrevista = moment(tsUscitaPrevista).minute(45);
+						} else {					
+							tsUscitaPrevista = moment(tsUscitaPrevista).add(1, 'hours');
+							tsUscitaPrevista = moment(tsUscitaPrevista).minute(0);
+						}
+					}
+				}			
+			}
+		}
+		
+		//calcolo le straordinarie anche in base all'ora di uscita impostata, solo se la data di uscita impostata è la stessa o successiva all'uscita prevista (altrimenti significa che sono uscito prima)		
+		if(tsUscita !== false) {
+			var isSameOrAfter = tsUscita.isSameOrAfter(tsUscitaPrevista);
+			if(isSameOrAfter) {
+				var straordinarieSerali = moment(tsUscita).subtract(tsUscitaPrevista.hour(), 'hours').subtract(tsUscitaPrevista.minutes(), 'minutes');
+				tsStraordinarie.add(straordinarieSerali.hour(), 'hours').add(straordinarieSerali.minutes(), 'minutes');
+			}
 		}
 		
 		controls.uscitaprevista.innerHTML = tsUscitaPrevista.format('HH:mm');
