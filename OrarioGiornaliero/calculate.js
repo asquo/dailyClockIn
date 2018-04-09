@@ -101,20 +101,16 @@ function calcolaUscitaPrevista() {
 		if(tsEntrata.hour() > 6 && tsEntrata.hour() < 9) {
 			if(tsEntrata.minutes() <= 5) {
 				tsUscitaPrevista.minute(tsEntrata.minutes());
-			} else {
-				if(tsEntrata.minutes() > 5 && tsEntrata.minutes() <= 30) {
-					tsUscitaPrevista.minute(30);
-					tsStraordinarie.minute(30 - tsEntrata.minutes());
-				} else {
-					if(tsEntrata.minutes() > 30 && tsEntrata.minutes() <= 35) {
-						tsUscitaPrevista.minute(tsEntrata.minutes());
-						tsStraordinarie.minute(tsEntrata.minutes() - tsEntrata.minutes());
-					} else { 
-						tsUscitaPrevista = moment(tsUscitaPrevista).add(1, 'hours');
-						tsUscitaPrevista.minute(0);
-						tsStraordinarie.minute(60 - tsEntrata.minute());
-					}
-				}
+			} else if(tsEntrata.minutes() > 5 && tsEntrata.minutes() <= 30) {
+				tsUscitaPrevista.minute(30);
+				tsStraordinarie.minute(30 - tsEntrata.minutes());
+			} else if(tsEntrata.minutes() > 30 && tsEntrata.minutes() <= 35) {
+				tsUscitaPrevista.minute(tsEntrata.minutes());
+				tsStraordinarie.minute(tsEntrata.minutes() - tsEntrata.minutes());
+			} else { 
+				tsUscitaPrevista = moment(tsUscitaPrevista).add(1, 'hours');
+				tsUscitaPrevista.minute(0);
+				tsStraordinarie.minute(60 - tsEntrata.minute());
 			}
 		}
 		
@@ -122,17 +118,13 @@ function calcolaUscitaPrevista() {
 		if(tsEntrata.hour() >= 9) {
 			if(tsEntrata.minutes() <= 15) {
 				tsUscitaPrevista.minute(tsEntrata.minutes());
+			} else if(tsEntrata.minutes() > 15 && tsEntrata.minutes() <= 30) {
+				tsUscitaPrevista.minute(30);
+			} else if (tsEntrata.minutes() > 30 && tsEntrata.minutes() <= 45) {
+				tsUscitaPrevista.minute(45);
 			} else {
-				if(tsEntrata.minutes() > 15 && tsEntrata.minutes() <= 30) {
-					tsUscitaPrevista.minute(30);
-				} else {
-					if(tsEntrata.minutes() > 30 && tsEntrata.minutes() <= 45) {
-						tsUscitaPrevista.minute(45);
-					} else {
-						tsUscitaPrevista = moment(tsUscitaPrevista).add(1, 'hours');
-						tsUscitaPrevista.minute(0);
-					}
-				}
+				tsUscitaPrevista = moment(tsUscitaPrevista).add(1, 'hours');
+				tsUscitaPrevista.minute(0);
 			}
 		}
 		
@@ -146,21 +138,15 @@ function calcolaUscitaPrevista() {
 			
 			if(tsRitardoPausaPranzo.minutes() === 0) {
 				tsUscitaPrevista = moment(tsUscitaPrevista).add(tsRitardoPausaPranzo.hour(), 'hours');
-			} else {
-				if(tsRitardoPausaPranzo.minutes() <= 15) {
-					tsUscitaPrevista = moment(tsUscitaPrevista).minute(tsRitardoPausaPranzo.minutes());
-				} else {			
-					if(tsRitardoPausaPranzo.minutes() > 15 && tsRitardoPausaPranzo.minutes() <= 30) {				
-						tsUscitaPrevista = moment(tsUscitaPrevista).minute(30);
-					} else {
-						if(tsRitardoPausaPranzo.minutes() > 30 && tsRitardoPausaPranzo.minutes() <= 45) {					
-							tsUscitaPrevista = moment(tsUscitaPrevista).minute(45);
-						} else {					
-							tsUscitaPrevista = moment(tsUscitaPrevista).add(1, 'hours');
-							tsUscitaPrevista = moment(tsUscitaPrevista).minute(0);
-						}
-					}
-				}			
+			} else if(tsRitardoPausaPranzo.minutes() <= 15) {
+				tsUscitaPrevista = moment(tsUscitaPrevista).minute(tsRitardoPausaPranzo.minutes());
+			} else if(tsRitardoPausaPranzo.minutes() > 15 && tsRitardoPausaPranzo.minutes() <= 30) {				
+				tsUscitaPrevista = moment(tsUscitaPrevista).minute(30);
+			} else if(tsRitardoPausaPranzo.minutes() > 30 && tsRitardoPausaPranzo.minutes() <= 45) {					
+				tsUscitaPrevista = moment(tsUscitaPrevista).minute(45);
+			} else {					
+				tsUscitaPrevista = moment(tsUscitaPrevista).add(1, 'hours');
+				tsUscitaPrevista = moment(tsUscitaPrevista).minute(0);
 			}
 		}
 		
